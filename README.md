@@ -23,7 +23,7 @@ T-Blog là một ứng dụng blog được xây dựng bằng Django, cho phép
 
 1. Clone dự án về máy của bạn:
 ```
-git clone <URL_của_repository>
+git clone https://github.com/hasmeddd/blog-new.git
 cd blog-new
 ```
 
