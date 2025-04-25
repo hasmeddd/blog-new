@@ -1,0 +1,512 @@
+{% extends "dashboard/dash_base.html" %}
+{% load static %}
+{% block body %}
+<div class="container post-version-view">
+    <div class="version-info">
+        <h2>{{ version.title }}</h2>
+        <p class="version-meta">
+            <span class="version-number">
+                {% if version.version_number == version.post.versions.first.version_number %}
+                Phiên bản mới nhất
+                {% else %}
+                Phiên bản {{ version.version_number }}
+                {% endif %}
+            </span> |
+            <span class="version-date">{{ version.created_at|date:"d/m/Y H:i" }}</span> |
+            <span class="version-author">{{ version.author }}</span> |
+            <span class="version-category">{{ version.category.name }}</span>
+            {% if version.modified_by %}
+            | <span class="version-modifier">Sửa bởi: {{ version.modified_by.username }}</span>
+            {% else %}
+            | <span class="version-modifier">Sửa bởi: Admin</span>
+            {% endif %}
+        </p>
+        
+        {% if changes %}
+        <div class="changes-list">
+            <h4>Đã thay đổi:</h4>
+            <ul>
+                {% for change in changes %}
+                <li>{{ change }}</li>
+                {% endfor %}
+            </ul>
+        </div>
+        {% endif %}
+    </div>
+
+    {% if previous_version %}
+    <div class="version-tabs">
+        <div class="tab-buttons">
+            <button id="normal-view" class="tab-btn active">Xem thường</button>
+            <button id="diff-view" class="tab-btn">Xem thay đổi</button>
+        </div>
+    </div>
+    {% endif %}
+
+    <div id="normal-content" class="version-content">
+        {{ version.content|safe }}
+    </div>
+
+    {% if previous_version %}
+    <div id="diff-content" class="version-content diff-display" style="display: none;">
+        <!-- Nội dung so sánh sẽ được thêm bởi JavaScript -->
+    </div>
+    {% endif %}
+
+    <div class="version-actions">
+        <a href="{% url 'update_post' post.post_id %}" class="btn btn-primary">Quay lại trang chỉnh sửa</a>
+    </div>
+</div>
+
+<style>
+    .post-version-view {
+        max-width: 900px;
+        margin: 2rem auto;
+        padding: 2rem;
+        background-color: #fff;
+        border-radius: 5px;
+        box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    }
+    .version-info {
+        margin-bottom: 2rem;
+        border-bottom: 1px solid #eee;
+        padding-bottom: 1rem;
+    }
+    .version-meta {
+        color: #666;
+        font-size: 0.9rem;
+        display: flex;
+        flex-wrap: wrap;
+        gap: 5px;
+    }
+    .version-modifier {
+        font-style: italic;
+        color: #495057;
+        font-weight: bold;
+    }
+    .version-content {
+        margin-bottom: 2rem;
+    }
+    .version-content img,
+    .version-content video,
+    .version-content iframe {
+        max-width: 100%;
+        height: auto;
+    }
+    .version-content table {
+        max-width: 100%;
+        overflow-x: auto;
+        display: block;
+    }
+    .version-actions {
+        margin-top: 2rem;
+        display: flex;
+        justify-content: flex-end;
+    }
+    .changes-list {
+        margin-top: 1rem;
+        padding: 10px;
+        background-color: #f8f9fa;
+        border-radius: 4px;
+    }
+    .changes-list h4 {
+        margin-top: 0;
+        margin-bottom: 0.5rem;
+        font-size: 1rem;
+        color: #333;
+    }
+    .changes-list ul {
+        margin: 0;
+        padding-left: 1.5rem;
+    }
+    .changes-list li {
+        color: #555;
+    }
+    .tab-buttons {
+        display: flex;
+        margin-bottom: 1rem;
+    }
+    .tab-btn {
+        padding: 8px 16px;
+        background-color: #f0f0f0;
+        border: 1px solid #ddd;
+        cursor: pointer;
+    }
+    .tab-btn:first-child {
+        border-radius: 4px 0 0 4px;
+    }
+    .tab-btn:last-child {
+        border-radius: 0 4px 4px 0;
+    }
+    .tab-btn.active {
+        background-color: #0066cc;
+        color: white;
+        border-color: #0066cc;
+    }
+    .diff-added {
+        background-color: #e6ffec;
+        color: #24663b;
+        border: 1px solid #aceeb5;
+        padding: 2px 4px;
+        border-radius: 3px;
+        display: inline-block;
+        margin: 0 1px;
+    }
+    .diff-removed {
+        background-color: #ffebe9;
+        color: #c93c37;
+        text-decoration: line-through;
+        border: 1px solid #ffcdd2;
+        padding: 2px 4px;
+        border-radius: 3px;
+        display: inline-block;
+        margin: 0 1px;
+    }
+    .diff-new-element {
+        position: relative;
+        display: inline-block;
+        margin: 5px 0;
+    }
+    .diff-new-label {
+        position: absolute;
+        top: 5px;
+        right: 5px;
+        background-color: #e6ffec;
+        color: #24663b;
+        border: 1px solid #aceeb5;
+        padding: 2px 6px;
+        border-radius: 3px;
+        font-size: 0.8rem;
+        font-weight: bold;
+        z-index: 10;
+    }
+    #diff-content img, 
+    #diff-content video,
+    #diff-content iframe,
+    #diff-content table {
+        max-width: 100%;
+    }
+    #diff-content p {
+        margin-bottom: 1em;
+    }
+    
+    /* Responsive styles */
+    @media (max-width: 992px) {
+        .post-version-view {
+            margin: 1rem;
+            padding: 1.5rem;
+        }
+    }
+    
+    @media (max-width: 768px) {
+        .post-version-view {
+            margin: 0.5rem;
+            padding: 1rem;
+        }
+        
+        .version-meta {
+            flex-direction: column;
+            align-items: flex-start;
+        }
+        
+        .version-meta span {
+            margin-bottom: 5px;
+        }
+        
+        .tab-btn {
+            padding: 6px 12px;
+            font-size: 0.9rem;
+        }
+    }
+    
+    @media (max-width: 576px) {
+        h2 {
+            font-size: 1.5rem;
+        }
+        
+        .post-version-view {
+            padding: 0.8rem;
+        }
+        
+        .version-actions {
+            justify-content: center;
+        }
+        
+        .diff-new-label {
+            font-size: 0.7rem;
+            padding: 2px 4px;
+        }
+    }
+</style>
+
+{% if previous_version %}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Lấy các elements cần thiết
+        const normalView = document.getElementById('normal-view');
+        const diffView = document.getElementById('diff-view');
+        const normalContent = document.getElementById('normal-content');
+        const diffContent = document.getElementById('diff-content');
+        
+        // Nội dung phiên bản hiện tại và phiên bản trước
+        const currentContent = `{{ version.content|escapejs }}`;
+        const previousContent = `{{ previous_version.content|escapejs }}`;
+        
+        // Hiển thị diff khi người dùng nhấp vào nút "Xem thay đổi"
+        diffView.addEventListener('click', function() {
+            try {
+                // Copy current content to diff view first
+                diffContent.innerHTML = currentContent;
+                
+                // Create temporary containers to compare HTML
+                const oldContainer = document.createElement('div');
+                const newContainer = document.createElement('div');
+                oldContainer.innerHTML = previousContent;
+                newContainer.innerHTML = currentContent;
+                
+                // Perform diff comparison
+                const diffHtml = generateHtmlDiff(oldContainer, newContainer);
+                
+                // Update the diff view with highlighted changes
+                diffContent.innerHTML = diffHtml;
+                
+                // Chuyển tab
+                normalContent.style.display = 'none';
+                diffContent.style.display = 'block';
+                normalView.classList.remove('active');
+                diffView.classList.add('active');
+            } catch (e) {
+                console.error('Lỗi khi so sánh nội dung:', e);
+                diffContent.innerHTML = 'Không thể so sánh nội dung. Lỗi: ' + e.message;
+            }
+        });
+        
+        // Generate HTML diff with highlighted changes
+        function generateHtmlDiff(oldElement, newElement) {
+            // Convert HTML to string with markers for comparison
+            const oldHtml = oldElement.innerHTML;
+            const newHtml = newElement.innerHTML;
+            
+            // If identical, just return the new content
+            if (oldHtml === newHtml) {
+                return newHtml;
+            }
+            
+            // Simple approach: copy the new HTML content and highlight differences in text
+            const resultElement = document.createElement('div');
+            resultElement.innerHTML = newHtml;
+            
+            // Find all text nodes in both old and new content
+            const oldTextNodes = getAllTextNodes(oldElement);
+            const newTextNodes = getAllTextNodes(resultElement);
+            
+            // Compare text nodes and highlight differences
+            for (let i = 0; i < Math.min(oldTextNodes.length, newTextNodes.length); i++) {
+                const oldText = oldTextNodes[i].textContent.trim();
+                const newText = newTextNodes[i].textContent.trim();
+                
+                if (oldText !== newText) {
+                    // Text has changed, highlight the differences
+                    const highlightedText = highlightTextDiff(oldText, newText);
+                    
+                    // Create a wrapper for the highlighted text
+                    const wrapper = document.createElement('span');
+                    wrapper.innerHTML = highlightedText;
+                    
+                    // Replace the original text node with our highlighted version
+                    if (newTextNodes[i].parentNode) {
+                        newTextNodes[i].parentNode.replaceChild(wrapper, newTextNodes[i]);
+                    }
+                }
+            }
+            
+            // If new content has more text nodes, mark them as added
+            if (newTextNodes.length > oldTextNodes.length) {
+                for (let i = oldTextNodes.length; i < newTextNodes.length; i++) {
+                    const node = newTextNodes[i];
+                    if (node.parentNode) {
+                        const wrapper = document.createElement('span');
+                        wrapper.className = 'diff-added';
+                        wrapper.textContent = node.textContent;
+                        node.parentNode.replaceChild(wrapper, node);
+                    }
+                }
+            }
+            
+            // Find images and other elements that might be new in the new version
+            highlightNewElements(oldElement, resultElement);
+            
+            return resultElement.innerHTML;
+        }
+        
+        // Get all text nodes in an element
+        function getAllTextNodes(element) {
+            const textNodes = [];
+            const walker = document.createTreeWalker(
+                element,
+                NodeFilter.SHOW_TEXT,
+                { acceptNode: node => node.textContent.trim() ? NodeFilter.FILTER_ACCEPT : NodeFilter.FILTER_REJECT },
+                false
+            );
+            
+            let node;
+            while (node = walker.nextNode()) {
+                textNodes.push(node);
+            }
+            
+            return textNodes;
+        }
+        
+        // Highlight differences between two text strings
+        function highlightTextDiff(oldText, newText) {
+            // Split texts into words for comparison
+            const oldWords = oldText.split(/\s+/).filter(word => word.length > 0);
+            const newWords = newText.split(/\s+/).filter(word => word.length > 0);
+            
+            let result = '';
+            let i = 0, j = 0;
+            
+            // Compare words
+            while (i < oldWords.length || j < newWords.length) {
+                if (i >= oldWords.length) {
+                    // Words added at the end
+                    while (j < newWords.length) {
+                        result += `<span class="diff-added">${newWords[j]}</span> `;
+                        j++;
+                    }
+                    break;
+                }
+                
+                if (j >= newWords.length) {
+                    // Words removed at the end
+                    while (i < oldWords.length) {
+                        result += `<span class="diff-removed">${oldWords[i]}</span> `;
+                        i++;
+                    }
+                    break;
+                }
+                
+                // Compare current words
+                if (oldWords[i] === newWords[j]) {
+                    result += newWords[j] + ' ';
+                    i++;
+                    j++;
+                } else {
+                    // Try to find matching words ahead
+                    let foundMatch = false;
+                    
+                    // Look ahead in old text
+                    for (let look = 1; look <= 5 && i + look < oldWords.length; look++) {
+                        if (oldWords[i + look] === newWords[j]) {
+                            // Words were removed
+                            for (let k = 0; k < look; k++) {
+                                result += `<span class="diff-removed">${oldWords[i + k]}</span> `;
+                            }
+                            i += look;
+                            foundMatch = true;
+                            break;
+                        }
+                    }
+                    
+                    if (!foundMatch) {
+                        // Look ahead in new text
+                        for (let look = 1; look <= 5 && j + look < newWords.length; look++) {
+                            if (newWords[j + look] === oldWords[i]) {
+                                // Words were added
+                                for (let k = 0; k < look; k++) {
+                                    result += `<span class="diff-added">${newWords[j + k]}</span> `;
+                                }
+                                j += look;
+                                foundMatch = true;
+                                break;
+                            }
+                        }
+                    }
+                    
+                    // If no matches found, treat as substitution
+                    if (!foundMatch) {
+                        result += `<span class="diff-removed">${oldWords[i]}</span> `;
+                        result += `<span class="diff-added">${newWords[j]}</span> `;
+                        i++;
+                        j++;
+                    }
+                }
+            }
+            
+            return result;
+        }
+        
+        // Highlight new elements like images
+        function highlightNewElements(oldElement, newElement) {
+            // Compare images
+            const oldImages = oldElement.querySelectorAll('img');
+            const newImages = newElement.querySelectorAll('img');
+            
+            // Check for new images
+            if (newImages.length > oldImages.length) {
+                for (let i = oldImages.length; i < newImages.length; i++) {
+                    // Add a visible border around new images
+                    newImages[i].style.border = '3px solid #24663b';
+                    newImages[i].style.padding = '2px';
+                    newImages[i].style.borderRadius = '4px';
+                    
+                    // Add a label to indicate it's new
+                    const wrapper = document.createElement('div');
+                    wrapper.className = 'diff-new-element';
+                    
+                    const newLabel = document.createElement('span');
+                    newLabel.textContent = 'Mới thêm';
+                    newLabel.className = 'diff-new-label';
+                    
+                    const parent = newImages[i].parentNode;
+                    parent.insertBefore(wrapper, newImages[i]);
+                    wrapper.appendChild(newImages[i]);
+                    wrapper.appendChild(newLabel);
+                }
+            }
+            
+            // Do the same for other elements like videos, iframes, etc.
+            highlightNewElementsByTag(oldElement, newElement, 'video');
+            highlightNewElementsByTag(oldElement, newElement, 'iframe');
+            highlightNewElementsByTag(oldElement, newElement, 'table');
+        }
+        
+        // Helper function to highlight new elements by tag
+        function highlightNewElementsByTag(oldElement, newElement, tagName) {
+            const oldItems = oldElement.querySelectorAll(tagName);
+            const newItems = newElement.querySelectorAll(tagName);
+            
+            if (newItems.length > oldItems.length) {
+                for (let i = oldItems.length; i < newItems.length; i++) {
+                    newItems[i].style.border = '3px solid #24663b';
+                    newItems[i].style.padding = '2px';
+                    newItems[i].style.borderRadius = '4px';
+                    
+                    // Add a label for new content
+                    const wrapper = document.createElement('div');
+                    wrapper.className = 'diff-new-element';
+                    
+                    const newLabel = document.createElement('span');
+                    newLabel.textContent = 'Nội dung mới';
+                    newLabel.className = 'diff-new-label';
+                    
+                    const parent = newItems[i].parentNode;
+                    parent.insertBefore(wrapper, newItems[i]);
+                    wrapper.appendChild(newItems[i]);
+                    wrapper.appendChild(newLabel);
+                }
+            }
+        }
+        
+        // Quay lại chế độ xem thường
+        normalView.addEventListener('click', function() {
+            normalContent.style.display = 'block';
+            diffContent.style.display = 'none';
+            normalView.classList.add('active');
+            diffView.classList.remove('active');
+        });
+    });
+</script>
+{% endif %}
+
+{% endblock body %} 

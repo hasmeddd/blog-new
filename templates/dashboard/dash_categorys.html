@@ -1,0 +1,97 @@
+{% extends "dashboard/dash_base.html" %}
+{% load static %}
+{% block body %}
+<div class="container filter">
+    <form class="filter-form" method="GET" action="">
+        <div class="filter-group">
+            <label for="search">Tìm kiếm:</label>
+            <input type="text" name="search" id="search" placeholder="Tìm kiếm ..." value="{{ search }}">
+        </div>
+        <div class="filter-group">
+            <label for="sort">Sắp xếp:</label>
+            <select name="sort" >
+                <option value="newest" {% if sort == 'newest' %}selected{% endif %}>Mới nhất</option>
+                <option value="oldest" {% if sort == 'oldest' %}selected{% endif %}>Cũ nhất</option>
+                <option value="name_asc" {% if sort == 'name_asc' %}selected{% endif %}>Sắp xếp từ (A-Z)</option>
+                <option value="name_desc" {% if sort == 'name_desc' %}selected{% endif %}>Sắp xếp từ (Z-A)</option>
+            </select>
+        </div>
+        <button type="submit" class="btn">Lọc</button>
+        <a href="{% url 'add_category' %}" class="btn">Thêm</a>
+    </form>
+</div>
+
+<div class="recent-post container">
+    <div class="table-wrapper">
+        <table class="table table-hover">
+            <thead>
+                <tr>
+                    <th scope="col">#</th>
+                    <th scope="col">Tên danh mục</th>
+                    <th scope="col">Slug</th>
+                    <th scope="col">Số bài viết</th>
+                    <th scope="col">Hành động</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for cat in categories %}
+                <tr>
+                    <th scope="row">{{ forloop.counter }}</th>
+                    <td>
+                        <form method="POST" action="{% url 'update_category' cat.category_id %}" class="update-form">
+                            {% csrf_token %}
+                            <input type="text" name="name" class="form-control" value="{{ cat.name }}" required>
+                            <button type="submit" class="btn btn-sm btn-primary d-none">Cập nhật</button>
+                        </form>
+                    </td>
+                    <td>{{ cat.slug }}</td>
+                    <td>{{ cat.category.count }}</td> 
+                    <td>
+                        <a href="#!" title="Lưu" onclick="this.closest('tr').querySelector('.update-form button').click()">
+                            <i class="fa-solid fa-save"></i>
+                        </a>
+                        <a href="{% url 'delete_category' cat.category_id %}" title="Xóa"onclick="return confirm('Bạn có chắc muốn xóa danh mục \'' + '{{ cat.name }}' + '\' không?');">
+                            <i class="fa-solid fa-trash"></i>
+                        </a>
+                    </td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="5">Không tìm thấy danh mục nào phù hợp.</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    <!-- Phân trang -->
+    {% if categories.paginator.num_pages > 1 %}
+    <div class="pagination">
+        <ul>
+            <!-- Nút Previous -->
+            {% if categories.has_previous %}
+            <li><a href="?page={{ categories.previous_page_number }}&search={{ search }}&start_date={{ start_date }}&end_date={{ end_date }}&sort={{ sort }}" class="prev">« Trước</a></li>
+            {% else %}
+            <li><span class="prev disabled">« Trước</span></li>
+            {% endif %}
+
+            <!-- Số trang -->
+            {% for num in categories.paginator.page_range %}
+            {% if categories.number == num %}
+            <li><span class="current">{{ num }}</span></li>
+            {% else %}
+            <li><a href="?page={{ num }}&search={{ search }}&start_date={{ start_date }}&end_date={{ end_date }}&sort={{ sort }}">{{ num }}</a></li>
+            {% endif %}
+            {% endfor %}
+
+            <!-- Nút Next -->
+            {% if categories.has_next %}
+            <li><a href="?page={{ categories.next_page_number }}&search={{ search }}&start_date={{ start_date }}&end_date={{ end_date }}&sort={{ sort }}" class="next">Tiếp »</a></li>
+            {% else %}
+            <li><span class="next disabled">Tiếp »</span></li>
+            {% endif %}
+        </ul>
+    </div>
+    {% endif %}
+</div>
+{% endblock body %}

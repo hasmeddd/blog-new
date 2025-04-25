@@ -1,0 +1,39 @@
+{% load static %}
+<div class="section-header">
+    <div class="slick-arrows-top">
+        <button type="button" data-role="none" class="carousel-topNav-prev slick-custom-buttons" aria-label="Previous">
+            <i class="icon-arrow-left"></i>
+        </button>
+        <button type="button" data-role="none" class="carousel-topNav-next slick-custom-buttons" aria-label="Next">
+            <i class="icon-arrow-right"></i>
+        </button>
+    </div>
+</div>
+
+<div class="match-schedule">
+    <div class="matches-container match-carousel">
+    {% for match in matches %}
+    <div class="match-play">
+        <div class="match-time-col">{{ match.start_time|date:"d-m-Y" }} - {{ match.play_time }}</div>
+        <div class="team-row hometeam">
+            <div class="team-info">
+                <img src="https://data.bongdaplus.vn/logo/{{ match.home_logo }}" alt="{{ match.home_logo }} logo" class="team-logo">
+                <span class="nameteam">{{ match.home_name }}</span>
+            </div>
+            <span class="score">{{ match.goals_home }}</span>
+        </div>
+        <div class="team-row awayteam">
+            <div class="team-info">
+                <img src="https://data.bongdaplus.vn/logo/{{ match.away_logo }}" alt="{{ match.away_name }} logo" class="team-logo">
+                <span class="nameteam">{{ match.away_name }}</span>
+            </div>
+            <span class="score">{{ match.goals_away }}</span>
+        </div>
+    </div>
+    {% empty %}
+    <div class="match-play">
+        <p>Không có lịch thi đấu nào hiện tại.</p>
+    </div>
+    {% endfor %}
+    </div>
+</div>

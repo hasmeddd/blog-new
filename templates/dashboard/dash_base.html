@@ -1,0 +1,197 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Admin</title>
+        <link rel="stylesheet" href="{%static 'dashboard/css/bootstrap.min.css' %}" />
+        <link rel="stylesheet" href="{% static 'dashboard/css/reset.css' %}" />
+        <link rel="stylesheet" href="{% static 'dashboard/css/admin-style.css' %}" />
+        <link rel="stylesheet" href="https://use.fontawesome.com/releases/v6.5.1/css/all.css" crossorigin="anonymous">
+
+        <script type="text/javascript" src="{% static 'dashboard/js/app.js' %}" defer></script>
+    </head>
+    <body>
+        <nav id="sidebar">
+            <ul>
+                <li>
+                    <a class="logo" href="{% url 'index' %}"><img src="{% static 'images/Logo-removebg-preview (1).png' %}" alt="logo" /></a> 
+                    <button onclick="toggleSideBar()" id="toggle-btn">
+                        <svg
+                            xmlns="http://www.w3.org/2000/svg"
+                            height="24px"
+                            viewBox="0 -960 960 960"
+                            width="24px"
+                            fill="#e8eaed"
+                        >
+                            <path
+                                d="M440-240 200-480l240-240 56 56-183 184 183 184-56 56Zm264 0L464-480l240-240 56 56-183 184 183 184-56 56Z"
+                            />
+                        </svg>
+                    </button>
+                </li>
+                <li>
+                    <a href="/dashboard/">
+                        <svg
+                            xmlns="http://www.w3.org/2000/svg"
+                            height="24px"
+                            viewBox="0 -960 960 960"
+                            width="24px"
+                            fill="#e8eaed"
+                        >
+                            <path
+                                d="M240-200h120v-240h240v240h120v-360L480-740 240-560v360Zm-80 80v-480l320-240 320 240v480H520v-240h-80v240H160Zm320-350Z"
+                            />
+                        </svg>
+                        <span>Bảng điều khiển</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="{% url 'post' %}">
+                        <svg
+                            xmlns="http://www.w3.org/2000/svg"
+                            height="24px"
+                            viewBox="0 -960 960 960"
+                            width="24px"
+                            fill="#e8eaed"
+                        >
+                            <path
+                                d="M280-120v-80h160v-124q-49-11-87.5-41.5T296-442q-75-9-125.5-65.5T120-640v-40q0-33 23.5-56.5T200-760h80v-80h400v80h80q33 0 56.5 23.5T840-680v40q0 76-50.5 132.5T664-442q-18 46-56.5 76.5T520-324v124h160v80H280Zm0-408v-152h-80v40q0 38 22 68.5t58 43.5Zm200 128q50 0 85-35t35-85v-240H360v240q0 50 35 85t85 35Zm200-128q36-13 58-43.5t22-68.5v-40h-80v152Zm-200-52Z"
+                            />
+                        </svg>
+                        <span>Bài viết</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="{% url 'comment' %}">
+                        <svg
+                            xmlns="http://www.w3.org/2000/svg"
+                            height="24px"
+                            viewBox="0 -960 960 960"
+                            width="24px"
+                            fill="#e8eaed"
+                        >
+                            <path
+                                d="M520-600v-240h320v240H520ZM120-440v-400h320v400H120Zm400 320v-400h320v400H520Zm-400 0v-240h320v240H120Zm80-400h160v-240H200v240Zm400 320h160v-240H600v240Zm0-480h160v-80H600v80ZM200-200h160v-80H200v80Zm160-320Zm240-160Zm0 240ZM360-280Z"
+                            />
+                        </svg>
+                        <span>Bình luận</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="{% url 'user' %}">
+                        <svg
+                            xmlns="http://www.w3.org/2000/svg"
+                            height="24px"
+                            viewBox="0 -960 960 960"
+                            width="24px"
+                            fill="#e8eaed"
+                        >
+                            <path
+                                d="M240-80v-172q-57-52-88.5-121.5T120-520q0-150 105-255t255-105q125 0 221.5 73.5T827-615l52 205q5 19-7 34.5T840-360h-80v120q0 33-23.5 56.5T680-160h-80v80h-80v-160h160v-200h108l-38-155q-23-91-98-148t-172-57q-116 0-198 81t-82 197q0 60 24.5 114t69.5 96l26 24v208h-80Zm254-360Zm-54 80h80l6-50q8-3 14.5-7t11.5-9l46 20 40-68-40-30q2-8 2-16t-2-16l40-30-40-68-46 20q-5-5-11.5-9t-14.5-7l-6-50h-80l-6 50q-8 3-14.5 7t-11.5 9l-46-20-40 68 40 30q-2 8-2 16t2 16l-40 30 40 68 46-20q5 5 11.5 9t14.5 7l6 50Zm40-100q-25 0-42.5-17.5T420-520q0-25 17.5-42.5T480-580q25 0 42.5 17.5T540-520q0 25-17.5 42.5T480-460Z"
+                            />
+                        </svg>
+                        <span>Người dùng</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="{% url 'category' %}">
+                        <svg
+                            xmlns="http://www.w3.org/2000/svg"
+                            height="24px"
+                            viewBox="0 -960 960 960"
+                            width="24px"
+                            fill="#e8eaed"
+                        >
+                            <path
+                                d="M240-80v-172q-57-52-88.5-121.5T120-520q0-150 105-255t255-105q125 0 221.5 73.5T827-615l52 205q5 19-7 34.5T840-360h-80v120q0 33-23.5 56.5T680-160h-80v80h-80v-160h160v-200h108l-38-155q-23-91-98-148t-172-57q-116 0-198 81t-82 197q0 60 24.5 114t69.5 96l26 24v208h-80Zm254-360Zm-54 80h80l6-50q8-3 14.5-7t11.5-9l46 20 40-68-40-30q2-8 2-16t-2-16l40-30-40-68-46 20q-5-5-11.5-9t-14.5-7l-6-50h-80l-6 50q-8 3-14.5 7t-11.5 9l-46-20-40 68 40 30q-2 8-2 16t2 16l-40 30 40 68 46-20q5 5 11.5 9t14.5 7l6 50Zm40-100q-25 0-42.5-17.5T420-520q0-25 17.5-42.5T480-580q25 0 42.5 17.5T540-520q0 25-17.5 42.5T480-460Z"
+                            />
+                        </svg>
+                        <span>Danh mục bài viết</span>
+                    </a>
+                </li>
+            </ul>
+        </nav>
+        <main>
+            <div class="header container">
+                
+                <div class="mobile-menu">
+                    <div class="mobile-menu-toggle">
+                        <h1 class="mobile-menu-title">{{ page_title|default:"Quản lý chung" }}</h1>
+                        <button class="dropdown-toggle-btn">
+                            <svg class="dropdown-icon" xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#000">
+                                <path d="M480-345 240-585l56-56 184 184 184-184 56 56-240 240Z" />
+                            </svg>
+                        </button>
+                    </div>
+                    <div class="mobile-menu-list">
+                        <a href="/">Trang chủ</a>
+                        <a href="{% url 'dashboard' %}">Bảng điều khiển</a>
+                        <a href="{% url 'post' %}">Bài viết</a>
+                        <a href="{% url 'comment' %}">Bình luận</a>
+                        <a href="{% url 'user' %}">Người dùng</a>
+                        <a href="{% url 'category' %}">Danh mục</a>
+                    </div>
+                </div>
+
+                <div class="profile">
+                    <img class="profile-img" src="{% static '/dashboard/img/undraw_profile_2.svg' %}" alt="user" />
+                    <span>{{ request.user }}|</span>
+                    <span><a href="{% url 'logout' %}">Đăng xuất</a></span>
+                </div>
+            </div>
+            {% if messages %}
+                {% for message in messages %}
+                    <div class="container alert alert-{% if message.tags == 'success' %}success{% elif message.tags == 'error' %}danger{% else %}info{% endif %} alert-dismissible fade show" role="alert">
+                        {{ message }}
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                    </div>
+                {% endfor %}
+            {% endif %}
+            
+            {% block body %}
+            
+
+            {% endblock body %}
+        </main>
+    </body>
+</html>
+<script src="{%static 'js/jquery.min.js' %}"></script>
+<script src="{%static 'js/popper.min.js' %}"></script>
+<script src="{%static 'js/bootstrap.min.js' %}"></script>
+<script src="{%static 'js/slick.min.js' %}"></script>
+<script src="{%static 'js/jquery.sticky-sidebar.min.js' %}"></script>
+<script src="{%static 'js/custom.js' %}"></script>
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const toggleBtn = document.querySelector('.mobile-menu-toggle');
+        const menuList = document.querySelector('.mobile-menu-list');
+    
+        toggleBtn.addEventListener('click', function () {
+            menuList.classList.toggle('active');
+        });
+    
+        // Đóng menu khi click bên ngoài
+        document.addEventListener('click', function (event) {
+            if (!toggleBtn.contains(event.target) && !menuList.contains(event.target)) {
+                menuList.classList.remove('active');
+            }
+        });
+    });
+</script>
+<script>
+	// Tự động ẩn alert sau 5 giây nếu người dùng không đóng
+  document.addEventListener('DOMContentLoaded', function() {
+	var alerts = document.querySelectorAll('.alert');
+	alerts.forEach(function(alert) {
+		setTimeout(function() {
+			if (alert.classList.contains('show')) {
+				var bsAlert = new bootstrap.Alert(alert);
+				bsAlert.close();
+			}
+		}, 5000);
+	});
+  });
+</script>
+

@@ -1,0 +1,52 @@
+{% extends "index.html" %}
+{% load static %}
+
+{% block main_content %}
+    <section class="main-content">
+        <div class="container-xl">
+            <div class="row gy-4">
+                <!-- Cột Bài viết đã lưu -->
+                <div class="col-lg-6">
+                    <div class="section-header">
+                        <h3 class="section-title">Bài viết đã lưu</h3>
+                    </div>
+                    <div class="padding-30 rounded bordered">
+                        {% if saved_posts %}
+                            <ul class="list-unstyled">
+                                {% for post in saved_posts %}
+                                    <li>
+                                        <a href="{% url 'post_detail' post.post_slug %}">{{ post.title }}</a>
+                                        - <small>{{ post.created_at|date:"d/m/Y" }}</small>
+                                    </li>
+                                {% endfor %}
+                            </ul>
+                        {% else %}
+                            <p>Bạn chưa lưu bài viết nào.</p>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <!-- Bài viết đã thích -->
+                <div class="col-lg-6">
+                    <div class="section-header">
+                        <h3 class="section-title">Bài viết đã thích</h3>
+                    </div>
+                    <div class="padding-30 rounded bordered">
+                        {% if liked_posts %}
+                            <ul class="list-unstyled">
+                                {% for post in liked_posts %}
+                                    <li>
+                                        <a href="{% url 'post_detail' post.post_slug %}">{{ post.title }}</a>
+                                        - <small>{{ post.created_at|date:"d/m/Y" }}</small>
+                                    </li>
+                                {% endfor %}
+                            </ul>
+                        {% else %}
+                            <p>Bạn chưa thích bài viết nào.</p>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+{% endblock main_content %}

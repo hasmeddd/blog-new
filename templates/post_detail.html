@@ -1,0 +1,163 @@
+{% extends "index.html" %}
+{% load static %}
+{% load social_share %}
+{% block main_content %}
+
+<!-- section main content -->
+<section class="main-content mt-3">
+    <div class="container-xl">
+        <div class="row gy-4">
+            <div class="col-lg-8">
+                <!-- post single -->
+                <div class="post post-single">
+					{% if messages %}
+						{% for message in messages %}
+							<div class="alert alert-{% if message.tags == 'success' %}success{% elif message.tags == 'error' %}danger{% else %}info{% endif %} alert-dismissible fade show" role="alert">
+								{{ message }}
+								<button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+							</div>
+						{% endfor %}
+					{% endif %}
+                    <!-- post header -->
+                    <div class="post-header">
+                        <h1 class="title mt-0 mb-3">{{post.title}}</h1>
+                        <ul class="meta list-inline mb-0">
+                            <li class="list-inline-item"><a href="#">{{post.author}}</a></li>
+                            <li class="list-inline-item"><a href="#">{{post.category}}</a></li>
+                            <li class="list-inline-item">{{post.created_at|date:"H:i d/m/Y"}}</li>
+                            <li class="list-inline-item">
+                                <form method="POST" action="{% url 'save_post' post.post_slug %}" style="display:inline;">
+                                    {% csrf_token %}
+                                    <button type="submit" class="btn btn-link p-0 action-btn bookmark-btn" style="border:none; background:none;">
+                                        <i class="fas fa-bookmark" style="color: {% if request.user in post.saved_by.all %}#fe4f70{% else %}#6c757d{% endif %};"></i>
+                                    </button>
+                                </form>
+                            </li>
+                            <li class="list-inline-item">
+                                <form method="POST" action="{% url 'like_post' post.post_slug %}" style="display:inline;">
+                                    {% csrf_token %}
+                                    <button type="submit" class="btn btn-link p-0 action-btn like-btn" style="border:none; background:none;">
+                                        <i class="fas fa-heart" style="color: {% if request.user in post.liked_by.all %}#fe4f70{% else %}#6c757d{% endif %};"></i>
+                                    </button>
+                                </form>
+                            </li>
+                            <li class="list-inline-item">
+                                <div class="social-share">
+                                    <button class="toggle-button icon-share"></button>
+                                    <ul class="icons list-unstyled list-inline mb-0">
+                                        <li class="list-inline-item">
+                                            {% post_to_facebook post.get_absolute_url '<i class="fab fa-facebook-f"></i>' %}
+                                        </li>
+                                        <li class="list-inline-item">
+                                            {% post_to_twitter post.title post.get_absolute_url '<i class="fab fa-twitter"></i>' %}
+                                        </li>
+                                        <li class="list-inline-item">
+                                            {% post_to_telegram post.title post.get_absolute_url '<i class="fab fa-telegram-plane"></i>' %}
+                                        </li>
+                                    </ul>
+                                </div>
+                            </li>
+                            
+                        </ul>
+                    </div>
+                    <!-- post content -->
+                    <div class="post-content clearfix">
+                        <p>{{post.content | safe}}</p>
+                        <p>Cập nhật lần cuối: {{ post.updated_at|date:"d/m/Y H:i" }}</p>
+                    </div>
+                </div>
+
+                <div class="spacer" data-height="30"></div>
+
+                <!-- section header -->
+                <div class="section-header">
+                    <h3 class="section-title">Bình luận ({{comments.count}})</h3>
+                </div>
+                <!-- post comments -->
+                <div class="comments bordered padding-30 rounded">
+					<ul class="comments">
+						{% for comment in comments %}
+						<li class="comment rounded">
+							<div class="details">
+								<h4 class="name">{{ comment.name }}</h4>
+								<span class="date">{{ comment.date|date:"d/m/Y" }}</span>
+								<p>{{ comment.comment }}</p>
+								{% if user.is_authenticated and comment.name == user.username %}
+									<form method="post" action="{% url 'delete_comment' comment.comment_id %}" style="display:inline;">
+										{% csrf_token %}
+										<button type="submit" class="btn btn-default " onclick="return confirm('Bạn có chắc muốn xóa bình luận này không?');">Xóa</button>
+									</form>
+								{% endif %}
+							</div>
+						</li>
+						{% endfor %}
+					</ul>
+				</div>
+
+                <div class="spacer" data-height="30"></div>
+
+                <!-- section header -->
+                <div class="section-header">
+                    <h3 class="section-title">Để lại bình luận</h3>
+                </div>
+                <!-- comment form -->
+                <div class="comment-form rounded bordered padding-30">
+                    
+					<form id="comment-form" class="comment-form" method="post" action="{% url 'add_comment' post.post_slug %}">
+						<div class="messages"></div>
+						{% csrf_token %}
+						
+						<div class="row">
+							<div class="column col-md-12">
+								<!-- Comment textarea -->
+								<div class="form-group">
+									<textarea name="InputComment" id="InputComment" class="form-control" rows="4" placeholder="Bình luận tại đây ..." required="required"></textarea>
+								</div>
+							</div>
+						</div>
+
+						<button type="submit" name="submit" id="submit" value="Submit" class="btn btn-default">Gửi</button>
+					</form>
+                    
+                </div>
+            </div>
+            <div class="col-lg-4">
+                <!-- sidebar -->
+                <div class="sidebar">
+                    <!-- widget popular posts -->
+                    <div class="widget rounded">
+                        <div class="widget-header text-center">
+                            <h3 class="widget-title">Xem nhiều</h3>
+                        </div>
+                        <div class="widget-content">
+                            <!-- post -->
+                            {% for post in xu_huong %}
+                            <div class="post post-list-sm circle">
+                                <div class="thumb circle">
+                                    <a href="{% url 'post_detail' post.post_slug %}">
+                                        <div class="inner">
+                                            <img src="{{ post.image.url }}" alt="{{ post.title }}" />
+                                        </div>
+                                    </a>
+                                </div>
+                                <div class="details clearfix">
+                                    <h6 class="post-title my-0"><a href="{% url 'post_detail' post.post_slug %}">{{ post.title }}</a></h6>
+                                    <ul class="meta list-inline mt-1 mb-0">
+                                        <li class="list-inline-item">{{ post.date|date:"d/m/Y" }}</li>
+                                    </ul>
+                                </div>
+                            </div>
+                            {% empty %}
+                            <div class="col-md-12">
+                                <p class="text-center">Chưa có bài viết nào</p>
+                            </div>
+                            {% endfor %}
+                        </div>    
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+{% endblock main_content %}

@@ -1,0 +1,34 @@
+{% extends "index.html" %}
+{% load static %}
+{% block main_content %}
+    <section class="main-content">
+        <div class="container-xl">
+            <div class="row gy-4">
+                <div class="col-lg-8">
+                    <div class="section-header">
+                        {% if searched %}
+                            <h3 class="section-title">Kết quả cho: "{{ searched }}"</h3>
+                        {% else %}
+                            <h3 class="section-title">Tìm kiếm bài viết</h3>
+                        {% endif %}
+                    </div>
+                    {% if searched %}
+                        {% if results %}
+                            {% for post in results %}
+                                <div class="post-item">
+                                    <h4><a href="{% url 'post_detail' post.post_slug %}">{{ post.title }}</a></h4>
+                                    <p>{{ post.content|striptags|truncatewords:30|safe }}</p>
+                                    <small>Ngày đăng: {{ post.created_at }}</small>
+                                </div>
+                            {% endfor %}
+                        {% else %}
+                            <p>Không tìm thấy bài viết nào phù hợp với "{{ searched }}".</p>
+                        {% endif %}
+                    {% else %}
+                        <p>Vui lòng nhập từ khóa để tìm kiếm.</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </section>
+{% endblock main_content %}

@@ -1,0 +1,271 @@
+{% extends "dashboard/dash_base.html" %}
+{% load static %}
+{% block body %}
+{{ form.media }}
+<div class="container add-blog">
+    <div class="page-header">
+        <h2>{{ page_title }}</h2>
+        {% if versions %}
+        <a href="#versions-section" id="versions-link" class="version-history-link">Lịch sử phiên bản</a>
+        {% endif %}
+    </div>
+    <form method="POST" enctype="multipart/form-data" class="add-blog-form">
+        {% csrf_token %}
+        <div class="form-group">
+            <label for="id_title">Tiêu đề:</label>
+            {{ form.title }}
+            {% if form.title.errors %}
+                <span class="text-danger">{{ form.title.errors }}</span>
+            {% endif %}
+        </div>
+        <div class="form-group">
+            <label for="id_author">Tác giả:</label>
+            {{ form.author }}
+            {% if form.author.errors %}
+                <span class="text-danger">{{ form.author.errors }}</span>
+            {% endif %}
+        </div>
+        <div class="form-group">
+            <label for="id_image">Hình ảnh:</label>
+            {{ form.image }}
+            {% if form.image.errors %}
+                <span class="text-danger">{{ form.image.errors }}</span>
+            {% endif %}
+        </div>
+        <div class="form-group">
+            <label for="id_content">Nội dung:</label>
+            {{ form.content }}
+            {% if form.content.errors %}
+                <span class="text-danger">{{ form.content.errors }}</span>
+            {% endif %}
+        </div>
+        <div class="form-group">
+            <label for="id_category">Danh mục:</label>
+            {{ form.category }}
+            {% if form.category.errors %}
+                <span class="text-danger">{{ form.category.errors }}</span>
+            {% endif %}
+        </div>
+        <div class="form-group">
+            <label for="id_status">Trạng thái:</label>
+            {{ form.status }}
+            {% if form.status.errors %}
+                <span class="text-danger">{{ form.status.errors }}</span>
+            {% endif %}
+        </div>
+        <div class="form-group">
+            <label for="id_section">Phần hiển thị:</label>
+            {{ form.section }}
+            {% if form.section.errors %}
+                <span class="text-danger">{{ form.section.errors }}</span>
+            {% endif %}
+        </div>
+        <div class="form-group">
+            <label for="id_Main_post">Bài viết chính:</label>
+            {{ form.Main_post }}
+            {% if form.Main_post.errors %}
+                <span class="text-danger">{{ form.Main_post.errors }}</span>
+            {% endif %}
+        </div>
+        <div class="form-group form-buttons">
+            <button type="submit" class="btn">Cập nhật</button>
+        </div>
+    </form>
+    
+    {% if versions %}
+    <div class="post-versions" id="versions-section">
+        <h3>Lịch sử cập nhật</h3>
+        <div class="versions-list">
+            {% for version in versions %}
+            <div class="version-item">
+                <a href="{% url 'view_post_version' version.version_id %}" class="version-link">
+                    {% if forloop.first and versions.number == 1 %}
+                    <span class="version-label latest">Phiên bản mới nhất</span>
+                    {% else %}
+                    <span class="version-label">Phiên bản {{ version.version_number }}</span>
+                    {% endif %}
+                    <span class="version-date">{{ version.created_at|date:"d/m/Y H:i" }}</span>
+                    {% if version.modified_by %}
+                    <span class="version-user">Sửa bởi: {{ version.modified_by.username }}</span>
+                    {% endif %}
+                </a>
+            </div>
+            {% endfor %}
+        </div>
+        
+        {% if versions.paginator.num_pages > 1 %}
+        <div class="pagination">
+            <ul class="pagination-list">
+                {% if versions.has_previous %}
+                <li class="pagination-item">
+                    <a href="?version_page=1" class="pagination-link">&laquo; Đầu</a>
+                </li>
+                <li class="pagination-item">
+                    <a href="?version_page={{ versions.previous_page_number }}" class="pagination-link">&lt;</a>
+                </li>
+                {% endif %}
+                
+                {% for i in versions.paginator.page_range %}
+                    {% if versions.number == i %}
+                    <li class="pagination-item active">
+                        <span class="pagination-link current">{{ i }}</span>
+                    </li>
+                    {% elif i > versions.number|add:'-3' and i < versions.number|add:'3' %}
+                    <li class="pagination-item">
+                        <a href="?version_page={{ i }}" class="pagination-link">{{ i }}</a>
+                    </li>
+                    {% endif %}
+                {% endfor %}
+                
+                {% if versions.has_next %}
+                <li class="pagination-item">
+                    <a href="?version_page={{ versions.next_page_number }}" class="pagination-link">&gt;</a>
+                </li>
+                <li class="pagination-item">
+                    <a href="?version_page={{ versions.paginator.num_pages }}" class="pagination-link">Cuối &raquo;</a>
+                </li>
+                {% endif %}
+            </ul>
+        </div>
+        {% endif %}
+    </div>
+    {% endif %}
+</div>
+
+<style>
+    .page-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 20px;
+        border-bottom: 1px solid #eee;
+        padding-bottom: 10px;
+    }
+    
+    .version-history-link {
+        font-size: 0.9rem;
+        color: #0066cc;
+        text-decoration: none;
+        padding: 5px 10px;
+        border: 1px solid #0066cc;
+        border-radius: 4px;
+        transition: all 0.2s;
+    }
+    
+    .version-history-link:hover {
+        background-color: #0066cc;
+        color: white;
+    }
+    
+    .post-versions {
+        margin-top: 2rem;
+        padding: 1rem;
+        background-color: #f9f9f9;
+        border-radius: 5px;
+        border: 1px solid #eee;
+    }
+    .post-versions h3 {
+        margin-bottom: 1rem;
+        font-size: 1.2rem;
+        color: #333;
+    }
+    .versions-list {
+        max-height: 300px;
+        overflow-y: auto;
+    }
+    .version-item {
+        padding: 0.5rem 0;
+        border-bottom: 1px solid #eee;
+    }
+    .version-item:last-child {
+        border-bottom: none;
+    }
+    .version-link {
+        display: block;
+        color: #0066cc;
+        text-decoration: none;
+        padding: 0.3rem 0.5rem;
+        border-radius: 3px;
+        transition: background-color 0.2s;
+    }
+    .version-link:hover {
+        background-color: #e9f2fd;
+        color: #003d7a;
+    }
+    
+    .version-label {
+        font-weight: bold;
+        margin-right: 10px;
+    }
+    
+    .version-label.latest {
+        color: #28a745;
+    }
+    
+    .version-date {
+        color: #666;
+        margin-right: 10px;
+    }
+    
+    .version-user {
+        color: #495057;
+        font-style: italic;
+    }
+    
+    /* Pagination styles */
+    .pagination {
+        margin-top: 1rem;
+        display: flex;
+        justify-content: center;
+    }
+    
+    .pagination-list {
+        display: flex;
+        list-style: none;
+        padding: 0;
+        margin: 0;
+    }
+    
+    .pagination-item {
+        margin: 0 2px;
+    }
+    
+    .pagination-link {
+        display: block;
+        padding: 5px 10px;
+        text-decoration: none;
+        color: #0066cc;
+        border: 1px solid #dee2e6;
+        border-radius: 3px;
+        transition: all 0.2s;
+    }
+    
+    .pagination-link:hover {
+        background-color: #e9f2fd;
+        border-color: #0066cc;
+    }
+    
+    .pagination-item.active .pagination-link,
+    .pagination-link.current {
+        background-color: #0066cc;
+        color: white;
+        border-color: #0066cc;
+    }
+    
+    /* Button styling */
+    .btn-secondary {
+        background-color: #6c757d;
+        color: white;
+        border: none;
+        margin-left: 10px;
+        padding: 10px 15px;
+        border-radius: 4px;
+        cursor: pointer;
+        transition: background-color 0.3s;
+    }
+    
+    .btn-secondary:hover {
+        background-color: #5a6268;
+    }
+</style>
+{% endblock body %}

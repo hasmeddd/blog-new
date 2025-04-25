@@ -1,0 +1,59 @@
+{% load static %}
+<!-- header -->
+<header class="header-default">
+    <nav class="navbar navbar-expand-lg">
+        <div class="container-xl">
+            <!-- site logo -->
+            <a class="navbar-brand" href="{% url 'index' %}"><img src="{% static 'images/Logo-removebg-preview (1).png' %}" alt="logo" /></a> 
+
+            <div class="collapse navbar-collapse">
+                <!-- menus -->
+                <ul class="navbar-nav mr-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'index' %}">Trang chủ</a>
+                    </li>
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                            Danh mục
+                        </a>
+                        <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
+                            {% for category in cat %}
+                                <li><a class="dropdown-item" href="{% url 'category' category.slug %}">{{ category.name }}</a></li>
+                            {% endfor %}
+                        </ul>
+                    </li>                        
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'contact' %}">Liên hệ</a>
+                    </li>
+                </ul>
+            </div>
+
+            <!-- header right section -->
+            <div class="header-right">
+                <div class="search-group">
+                    <form class="d-flex search-form" method="GET" action="{% url 'search_posts' %}">
+                        <input class="form-control me-2 search-input" type="text" placeholder="Tìm kiếm" name="q" />
+                        <button type="submit" class="search icon-button">
+                            <i class="icon-magnifier"></i>
+                        </button>
+                    </form>
+                    <!-- Nút ảo để kích hoạt -->
+                    <button class="search icon-button trigger-btn">
+                        <i class="icon-magnifier"></i>
+                    </button>
+                </div>
+                <!-- header buttons -->
+                <div class="header-buttons">
+                    {% if request.user.is_authenticated %}
+                        <!-- Hiển thị burger menu khi đã đăng nhập -->
+                        <button class="burger-menu icon-button">
+                            <span class="burger-icon"></span>
+                        </button>
+                    {% else %}
+                        <a href="{% url 'login' %}" class="btn-login">Đăng nhập</a>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </nav>
+</header>

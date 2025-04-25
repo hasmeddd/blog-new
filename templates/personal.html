@@ -1,0 +1,71 @@
+{% extends "index.html" %}
+{% load static %}
+{% block main_content %}
+    <section class="main-content">
+        <div class="container-xl">
+            <div class="row gy-4">
+                <div class="col-lg-8">
+                    <div class="section-header">
+                        <h3 class="section-title">Thông tin cá nhân</h3>
+                    </div>
+                    <div class="padding-30 rounded bordered">
+                        {% if messages %}
+                            {% for message in messages %}
+                                <div class="alert {% if message.tags == 'success' %}alert-success{% else %}alert-danger{% endif %} alert-dismissible fade show" role="alert">
+                                    {{ message }}
+                                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                                </div>
+                            {% endfor %}
+                        {% endif %}
+
+                        <!-- Thông tin cá nhân -->
+                        <h4>Xin chào, {{ user.username }}!</h4>
+                        <form method="POST" action="{% url 'personal' %}">
+                            {% csrf_token %}
+                            <div class="mb-3">
+                                <label for="username" class="form-label">Tên tài khoản</label>
+                                {{ form.username }}
+                            </div>
+                            <div class="mb-3">
+                                <label for="email" class="form-label">Email</label>
+                                {{ form.email }}
+                            </div>
+                            <div class="mb-3">
+                                <label for="first_name" class="form-label">Họ</label>
+                                {{ form.first_name }}
+                            </div>
+                            <div class="mb-3">
+                                <label for="last_name" class="form-label">Tên</label>
+                                {{ form.last_name }}
+                            </div>
+                            <button type="submit" name="update" class="btn btn-simple">Cập nhật thông tin</button>
+                        </form>
+                    </div>
+                </div>
+                <div class="col-lg-4">
+                    <div class="section-header">
+                        <h3 class="section-title">Đổi mật khẩu</h3>
+                    </div>
+                    <div class="padding-30 rounded bordered">
+                        <form method="POST" action="{% url 'personal' %}">
+                            {% csrf_token %}
+                            <div class="mb-3">
+                                <label for="old_password" class="form-label">Mật khẩu cũ</label>
+                                {{ password_form.old_password }}
+                            </div>
+                            <div class="mb-3">
+                                <label for="new_password1" class="form-label">Mật khẩu mới</label>
+                                {{ password_form.new_password1 }}
+                            </div>
+                            <div class="mb-3">
+                                <label for="new_password2" class="form-label">Xác nhận mật khẩu mới</label>
+                                {{ password_form.new_password2 }}
+                            </div>
+                            <button type="submit" name="change_password" class="btn btn-simple">Đổi mật khẩu</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+{% endblock main_content %}

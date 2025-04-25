@@ -1,0 +1,95 @@
+{% extends "dashboard/dash_base.html" %}
+{% load static %}
+{% block body %}
+<div class="container filter">
+    <form class="filter-form" method="GET" action="">
+        <div class="filter-group">
+            <label for="search">Tìm kiếm:</label>
+            <input type="text" name="search" id="search" placeholder="Tìm kiếm ...">
+        </div>
+        <div class="filter-group">
+            <label for="period">Thời gian:</label>
+            <select name="period" id="period">
+                <option value="all" {% if period == 'all' %}selected{% endif %}>Tất cả</option>
+                <option value="today" {% if period == 'today' %}selected{% endif %}>Hôm nay</option>
+                <option value="week" {% if period == 'week' %}selected{% endif %}>Tuần này</option>
+                <option value="last_week" {% if period == 'last_week' %}selected{% endif %}>Tuần trước</option>
+                <option value="month" {% if period == 'month' %}selected{% endif %}>Tháng này</option>
+                <option value="last_month" {% if period == 'last_month' %}selected{% endif %}>Tháng trước</option>
+            </select>
+        </div>
+        <div class="filter-group">
+            <label for="sort">Sắp xếp:</label>
+            <select name="sort" id="sort">
+                <option value="newest">Mới nhất</option>
+                <option value="oldest">Cũ nhất</option>
+            </select>
+        </div>
+        <button type="submit" class="btn">Lọc</button>
+    </form>
+</div>
+
+<div class="all-post container">
+    <div class="table-wrapper">
+        <table class="table table-hover">
+            <thead>
+                <tr>
+                    <th scope="col">#</th>
+                    <th scope="col">Usename</th>
+                    <th scope="col">Email</th>
+                    <th scope="col">Bài viết</th>
+                    <th scope="col">Nội dung</th>
+                    <th scope="col">Ngày đăng</th>
+                    <th scope="col">Hành động</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for comment in all_comments %}
+                <tr>
+                    <th scope="row">{{ forloop.counter }}</th>
+                    <td>{{ comment.name }}</td>
+                    <td>{{ comment.email }}</td>
+                    <td>{{ comment.post.title }}</td>
+                    <td>{{ comment.comment|truncatewords:10 }}</td>
+                    <td>{{ comment.created_at|date:"H:i d/m/Y" }}</td>
+                    <td>
+                        <a href="{% url 'delete_comment' comment.comment_id %}" title="Xóa" onclick="return confirm('Bạn có chắc muốn xóa bình luận này không?')">
+                            <i class="fa-solid fa-trash"></i>
+                        </a>
+                    </td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="8">Không tìm thấy bình luận nào phù hợp.</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    {% if all_comments.paginator.num_pages > 1 %}
+    <div class="pagination">
+        <ul>
+            {% if all_comments.has_previous %}
+            <li><a href="?page={{ all_comments.previous_page_number }}" class="prev">« Trước</a></li>
+            {% else %}
+            <li><span class="prev disabled">« Trước</span></li>
+            {% endif %}
+
+            {% for num in all_comments.paginator.page_range %}
+            {% if all_comments.number == num %}
+            <li><span class="current">{{ num }}</span></li>
+            {% else %}
+            <li><a href="?page={{ num }}">{{ num }}</a></li>
+            {% endif %}
+            {% endfor %}
+
+            {% if all_comments.has_next %}
+            <li><a href="?page={{ all_comments.next_page_number }}" class="next">Tiếp »</a></li>
+            {% else %}
+            <li><span class="next disabled">Tiếp »</span></li>
+            {% endif %}
+        </ul>
+    </div>
+    {% endif %}
+</div>
+{% endblock body %}

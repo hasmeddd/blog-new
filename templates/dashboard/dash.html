@@ -1,0 +1,126 @@
+{% extends "dashboard/dash_base.html" %}
+{% load static %}
+{% block body %}
+<div class="container filter">
+    <form class="filter-form" method="GET" action="">
+        <div class="filter-group">
+            <label for="category">Danh mục:</label>
+            <select name="category" id="category">
+                <option value="">Tất cả</option>
+                {% for category in categories %}
+                <option value="{{ category.slug }}" {% if selected_category == category.slug %}selected{% endif %}>
+                  {{ category.name }}
+                </option>
+                {% endfor %}
+            </select>
+        </div>
+        <div class="filter-group">
+            <label for="period">Thống kê theo:</label>
+            <select name="period" id="period">
+                <option value="all" {% if period == 'all' %}selected{% endif %}>Tất cả</option>
+                <option value="today" {% if period == 'today' %}selected{% endif %}>Hôm nay</option>
+                <option value="week" {% if period == 'week' %}selected{% endif %}>Tuần này</option>
+                <option value="last_week" {% if period == 'last_week' %}selected{% endif %}>Tuần trước</option>
+                <option value="month" {% if period == 'month' %}selected{% endif %}>Tháng này</option>
+                <option value="last_month" {% if period == 'last_month' %}selected{% endif %}>Tháng trước</option>
+            </select>
+        </div>
+        <button type="submit" class="btn">Lọc</button>
+    </form>
+</div>
+<div class="stats container">
+  <div class="total-posts">
+      <h3>Bài viết</h3>
+      <p>{{ total_posts }}</p>
+  </div>
+  <div class="total-views">
+      <h3>Lượt xem</h3>
+      <p>{{ total_views }}</p>
+  </div>
+  <div class="total-comment">
+      <h3>Bình luận</h3>
+      <p>{{ total_comments }}</p>
+  </div>
+  <div class="total-user">
+    <h3>Người dùng</h3>
+    <p>{{ total_users }}</p>
+</div>
+</div>
+<div class="recent-post container">
+    <!-- Charts Section -->
+    <div class="row g-4">
+        <div class="col-md-6">
+            <div class="card shadow-sm">
+                <div class="card-body">
+                    <canvas id="barChart" height="200"></canvas>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="card shadow-sm">
+                <div class="card-body">
+                    <canvas id="lineChart" height="200"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Thêm Chart.js từ CDN -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+    // Dữ liệu từ template Django
+    const totalPosts = {{ total_posts }};
+    const totalViews = {{ total_views }};
+    const totalComments = {{ total_comments }};
+    const totalUsers = {{ total_users }};
+
+    // Dữ liệu chung cho tất cả biểu đồ
+    const chartData = {
+        labels: ['Bài viết', 'Lượt xem', 'Bình luận', 'Người dùng'],
+        datasets: [{
+            label: 'Thống kê',
+            data: [totalPosts, totalViews, totalComments, totalUsers],
+            backgroundColor: [
+                'rgba(75, 192, 192, 0.6)',
+                'rgba(255, 99, 132, 0.6)',
+                'rgba(54, 162, 235, 0.6)',
+                'rgba(255, 206, 86, 0.6)'
+            ],
+            borderColor: [
+                'rgba(75, 192, 192, 1)',
+                'rgba(255, 99, 132, 1)',
+                'rgba(54, 162, 235, 1)',
+                'rgba(255, 206, 86, 1)'
+            ],
+            borderWidth: 1
+        }]
+    };
+
+    // Cấu hình biểu đồ cột
+    const barCtx = document.getElementById('barChart').getContext('2d');
+    new Chart(barCtx, {
+        type: 'bar',
+        data: chartData,
+        options: {
+            scales: {
+                y: { beginAtZero: true }
+            },
+            plugins: { legend: { display: false } }
+        }
+    });
+
+    // Cấu hình biểu đồ đường
+    const lineCtx = document.getElementById('lineChart').getContext('2d');
+    new Chart(lineCtx, {
+        type: 'line',
+        data: chartData,
+        options: {
+            scales: {
+                y: { beginAtZero: true }
+            },
+            plugins: { legend: { display: false } }
+        }
+    });
+</script>
+{% endblock body %}

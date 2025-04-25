@@ -1,0 +1,136 @@
+{% extends "dashboard/dash_base.html" %}
+{% load static %}
+{% block body %}
+<div class="container filter">
+    <form class="filter-form" method="GET" action="">
+        <div class="filter-group">
+            <label for="search">Tìm kiếm:</label>
+            <input type="text" name="search" id="search" placeholder="Tìm kiếm ...">
+        </div>
+        <div class="filter-group">
+            <label for="category">Danh mục:</label>
+            <select name="category" id="category">
+                <option value="">Tất cả</option>
+                {% for category in categories %}
+                <option value="{{ category.slug }}" {% if selected_category == category.slug %}selected{% endif %}>
+                  {{ category.name }}
+                </option>
+                {% endfor %}
+            </select>
+        </div>
+        <div class="filter-group">
+            <label for="period">Thời gian:</label>
+            <select name="period" id="period">
+                <option value="all" {% if period == 'all' %}selected{% endif %}>Tất cả</option>
+                <option value="today" {% if period == 'today' %}selected{% endif %}>Hôm nay</option>
+                <option value="week" {% if period == 'week' %}selected{% endif %}>Tuần này</option>
+                <option value="last_week" {% if period == 'last_week' %}selected{% endif %}>Tuần trước</option>
+                <option value="month" {% if period == 'month' %}selected{% endif %}>Tháng này</option>
+                <option value="last_month" {% if period == 'last_month' %}selected{% endif %}>Tháng trước</option>
+            </select>
+        </div>
+        <div class="filter-group">
+            <label for="sort">Sắp xếp:</label>
+            <select name="sort" id="sort">
+                <option value="newest">Mới nhất</option>
+                <option value="oldest">Cũ nhất</option>
+                <option value="title_asc">Tiêu đề A-Z</option>
+                <option value="title_desc">Tiêu đề Z-A</option>
+                <option value="draft">Bản nháp</option>
+                <option value="most_liked">Lượt thích</option>
+                <option value="most_viewed">Lượt xem</option>
+            </select>
+        </div>
+        <div class="filter-group filter-buttons">
+            <button type="submit" class="btn">Lọc</button>
+            <a href="{% url 'add_post' %}" class="btn">Thêm</a>
+        </div>
+    </form>
+</div>
+<!-- Begin Page Content -->
+<div class="all-post container">
+    <div class="table-wrapper">
+        <table class="table table-hover">
+            <thead>
+                <tr>
+                    <th scope="col">#</th>
+                    <th scope="col">Tiêu đề</th>
+                    <th scope="col">Hình ảnh</th>
+                    <th scope="col">Danh mục</th>
+                    <th scope="col">Tác giả</th>
+                    <th scope="col">Ngày tạo</th>
+                    <th scope="col">Lượt xem</th>
+                    <th scope="col">Lượt thích</th>
+                    <th scope="col">Đã lưu</th>
+                    <th scope="col">Bình luận</th>
+                    <th scope="col">Trạng thái</th>
+                    <th scope="col">Hành động</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for po in post %}
+                <tr>
+                    <th scope="row">{{ forloop.counter }}</th>
+                    <td col="2">{{ po.title }}</td>
+                    <td><img src="{{ po.image.url }}" alt="{{ po.title }}" style="max-width: 100px; height: auto;"></td>
+                    <td>{{ po.category }}</td>
+                    <td>{{ po.author }}</td>
+                    <td>{{ po.created_at|date:"H:i d/m/Y" }}</td>
+                    <td>{{ po.views }}</td>
+                    <td>{{ po.liked_by.count }}</td>
+                    <td>{{ po.saved_by.count }}</td>
+                    <td>{{ po.comments.count }}</td>
+                    <td>
+                        <span class="{% if po.status == "0" or po.status == 0 %}status-draft{% else %}status-published{% endif %}">
+                            {{ po.get_status_display }}
+                        </span>
+                    </td>
+                    <td>
+                        <a href="{% url 'update_post' po.post_id %}" title="Chỉnh sửa">
+                            <i class="fa-solid fa-pen"></i>
+                        </a>
+                        <a href="{% url 'delete_post' po.post_id %}" title="Xóa" onclick="return confirm('Bạn có chắc muốn xóa bài viết này không?')">
+                            <i class="fa-solid fa-trash"></i>
+                        </a>
+                    </td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="8">Không tìm thấy bài viết nào phù hợp.</td>
+                </tr>
+                {% endfor %}
+                
+            </tbody>
+        </table>
+    </div>
+    {% if post.paginator.num_pages > 1 %}
+    <div class="pagination">
+        <ul>
+            <!-- Nút Previous -->
+            {% if post.has_previous %}
+            <li><a href="?page={{ post.previous_page_number }}&search={{ search|urlencode }}&category={{ selected_category|urlencode }}&start_date={{ start_date|date:'Y-m-d'|urlencode }}&end_date={{ end_date|date:'Y-m-d'|urlencode }}&sort={{ sort|urlencode }}" class="prev">« Trước</a></li>
+            {% else %}
+            <li><span class="prev disabled">« Trước</span></li>
+            {% endif %}
+
+            <!-- Số trang -->
+            {% for num in post.paginator.page_range %}
+            {% if post.number == num %}
+            <li><span class="current">{{ num }}</span></li>
+            {% else %}
+            <li><a href="?page={{ num }}&search={{ search|urlencode }}&category={{ selected_category|urlencode }}&start_date={{ start_date|date:'Y-m-d'|urlencode }}&end_date={{ end_date|date:'Y-m-d'|urlencode }}&sort={{ sort|urlencode }}">{{ num }}</a></li>
+            {% endif %}
+            {% endfor %}
+
+            <!-- Nút Next -->
+            {% if post.has_next %}
+            <li><a href="?page={{ post.next_page_number }}&search={{ search|urlencode }}&category={{ selected_category|urlencode }}&start_date={{ start_date|date:'Y-m-d'|urlencode }}&end_date={{ end_date|date:'Y-m-d'|urlencode }}&sort={{ sort|urlencode }}" class="next">Tiếp »</a></li>
+            {% else %}
+            <li><span class="next disabled">Tiếp »</span></li>
+            {% endif %}
+        </ul>
+    </div>
+    {% endif %}
+</div>
+    <!-- /.container-fluid -->
+{% endblock body %}

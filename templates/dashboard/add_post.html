@@ -1,0 +1,69 @@
+{% extends "dashboard/dash_base.html" %}
+{% load static %}
+{% block body %}
+{{ form.media }}
+<div class="container add-blog">
+    <form method="POST" enctype="multipart/form-data" class="add-blog-form">
+        {% csrf_token %}
+        <div class="form-group">
+            <label for="id_title">Tiêu đề:</label>
+            {{ form.title }}
+            {% if form.title.errors %}
+                <span class="text-danger">{{ form.title.errors }}</span>
+            {% endif %}
+        </div>
+        <div class="form-group">
+            <label for="id_author">Tác giả:</label>
+            {{ form.author }}
+            {% if form.author.errors %}
+                <span class="text-danger">{{ form.author.errors }}</span>
+            {% endif %}
+        </div>
+        <div class="form-group">
+            <label for="id_image">Hình ảnh:</label>
+            {{ form.image }}
+            {% if form.image.errors %}
+                <span class="text-danger">{{ form.image.errors }}</span>
+            {% endif %}
+        </div>
+        <div class="form-group">
+            <label for="id_content">Nội dung:</label>
+            {{ form.content }}
+            {% if form.content.errors %}
+                <span class="text-danger">{{ form.content.errors }}</span>
+            {% endif %}
+        </div>
+        <div class="form-group">
+            <label for="id_category">Danh mục:</label>
+            {{ form.category }}
+            {% if form.category.errors %}
+                <span class="text-danger">{{ form.category.errors }}</span>
+            {% endif %}
+        </div>
+        <div class="form-group">
+            <label for="id_status">Trạng thái:</label>
+            {{ form.status }}
+            {% if form.status.errors %}
+                <span class="text-danger">{{ form.status.errors }}</span>
+            {% endif %}
+        </div>
+        <div class="form-group">
+            <label for="id_section">Phần hiển thị:</label>
+            {{ form.section }}
+            {% if form.section.errors %}
+                <span class="text-danger">{{ form.section.errors }}</span>
+            {% endif %}
+        </div>
+        <div class="form-group">
+            <label for="id_Main_post">Bài viết chính:</label>
+            {{ form.Main_post }}
+            {% if form.Main_post.errors %}
+                <span class="text-danger">{{ form.Main_post.errors }}</span>
+            {% endif %}
+        </div>
+        <div class="form-group form-buttons">
+            <button type="submit" class="btn">Thêm</button>
+        </div>
+    </form>
+</div>
+{% endblock body %}

@@ -1,0 +1,60 @@
+{% extends "index.html" %}
+{% load static %}
+{% block main_content %}
+    <section class="main-content">
+        <div class="container-xl">
+            <div class="row gy-4">
+                <div class="col-lg-12">
+                    <div class="section-header">
+                        <h3 class="section-title">{{ category.name }}</h3>
+                    </div>
+                    <div class="padding-30 rounded bordered">
+                        <div class="row" id="post-list">
+                            {% for post in posts %}
+                                <div class="col-md-12 col-sm-6">
+                                    <div class="post post-list clearfix">
+                                        <div class="thumb rounded">
+                                            <a href="{% url 'post_detail' post.post_slug %}">
+                                                <div class="inner">
+                                                    <img src="{{ post.image.url }}" alt="{{ post.title }}" />
+                                                </div>
+                                            </a>
+                                        </div>
+                                        <div class="details">
+                                            <ul class="meta list-inline mb-3">
+                                                <li class="list-inline-item"><a href="#">{{ post.author }}</a></li>
+                                                <li class="list-inline-item"><a href="#">{{ post.category }}</a></li>
+                                                <li class="list-inline-item">{{ post.created_at|date:"d/m/Y" }}</li>
+                                            </ul>
+                                            <h5 class="post-title">
+                                                <a href="{% url 'post_detail' post.post_slug %}">{{ post.title }}</a>
+                                            </h5>
+                                            <p class="excerpt mb-0">{{ post.content|truncatewords:20|safe }}</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            {% empty %}
+                                <div class="col-md-12">
+                                    <p class="text-center">Chưa có bài viết nào trong danh mục này.</p>
+                                </div>
+                            {% endfor %}
+                        </div>
+                        <!-- Nút Tải thêm -->
+                        <div class="text-center mt-4">
+                            {% if posts.has_next %}
+                                <button class="btn btn-simple load-more" 
+                                        data-next-page="{{ posts.next_page_number }}"
+                                        data-url="{% url 'category' category.slug %}">
+                                    Xem thêm
+                                </button>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+                <!-- <div class="col-lg-4">
+                    
+                </div> -->
+            </div>
+        </div>
+    </section>
+{% endblock main_content %}

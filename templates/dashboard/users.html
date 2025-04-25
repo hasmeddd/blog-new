@@ -1,0 +1,118 @@
+{% extends "dashboard/dash_base.html" %}
+{% load static %}
+{% block body %}
+<div class="container filter">
+    <form class="filter-form" method="GET" action="">
+        <div class="filter-group">
+            <label for="search">Tìm kiếm:</label>
+            <input type="text" name="search" id="search" placeholder="Tìm kiếm ...">
+        </div>
+        <div class="filter-group">
+            <label for="period">Thời gian:</label>
+            <select name="period" id="period">
+                <option value="all" {% if period == 'all' %}selected{% endif %}>Tất cả</option>
+                <option value="today" {% if period == 'today' %}selected{% endif %}>Hôm nay</option>
+                <option value="week" {% if period == 'week' %}selected{% endif %}>Tuần này</option>
+                <option value="last_week" {% if period == 'last_week' %}selected{% endif %}>Tuần trước</option>
+                <option value="month" {% if period == 'month' %}selected{% endif %}>Tháng này</option>
+                <option value="last_month" {% if period == 'last_month' %}selected{% endif %}>Tháng trước</option>
+            </select>
+        </div>
+        <div class="filter-group">
+            <label for="sort">Sắp xếp:</label>
+            <select name="sort" id="sort">
+                <option value="newest">Mới nhất</option>
+                <option value="oldest">Cũ nhất</option>
+                <option value="active">Người dùng đang hoạt động</option>
+                <option value="blocked">Người dùng bị khóa</option>
+            </select>
+        </div>
+        <button type="submit" class="btn">Lọc</button>
+    </form>
+</div>
+
+<div class="all-post container">
+    <div class="table-wrapper">
+        <table class="table table-hover">
+            <thead>
+                <tr>
+                    <th scope="col">#</th>
+                    <th scope="col">Tên người dùng</th>
+                    <th scope="col">Email</th>
+                    <th scope="col">Ngày tham gia</th>
+                    <th scope="col">Trạng thái</th>
+                    <th scope="col">Quyền</th>
+                    <th scope="col">Hành động</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for user in users %}
+                <tr>
+                    <th scope="row">{{ forloop.counter }}</th>
+                    <td>{{ user.username }}</td>
+                    <td>{{ user.email }}</td>
+                    <td>{{ user.date_joined|date:"H:i d/m/Y" }}</td>
+                    <td>
+                        <form method="POST" action="{% url 'update_user' user.id %}" class="user-update-form">
+                            {% csrf_token %}
+                            <input type="hidden" name="user_id" value="{{ user.id }}">
+                            <select name="status" onchange="this.form.submit()" {% if user.is_superuser %}disabled{% endif %}>
+                                <option value="active" {% if user.is_active %}selected{% endif %}>Hoạt động</option>
+                                <option value="lock" {% if not user.is_active %}selected{% endif %}>Khóa</option>
+                            </select>
+                        </form>
+                    </td>
+                    <td>
+                        {% if user.is_superuser %}
+                            Quản trị viên
+                        {% else %}
+                            Người dùng
+                        {% endif %}
+                    </td>
+                    <td>
+                        {% if not user.is_superuser %}
+                            <a href="{% url 'delete_user' user.id %}" title="Xóa" onclick="return confirm('Bạn có chắc muốn xóa người dùng {{ user.username }} không?')">
+                                <i class="fa-solid fa-trash"></i>
+                            </a>
+                        {% else %}
+                            <span title="Không thể xóa quản trị viên">
+                                <i class="fa-solid fa-trash text-muted"></i>
+                            </span>
+                        {% endif %}
+                    </td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="8">Không tìm thấy người dùng nào phù hợp.</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    {% if users.paginator.num_pages > 1 %}
+    <div class="pagination">
+        <ul>
+            {% if users.has_previous %}
+            <li><a href="?page={{ users.previous_page_number }}" class="prev">« Trước</a></li>
+            {% else %}
+            <li><span class="prev disabled">« Trước</span></li>
+            {% endif %}
+
+            {% for num in users.paginator.page_range %}
+            {% if users.number == num %}
+            <li><span class="current">{{ num }}</span></li>
+            {% else %}
+            <li><a href="?page={{ num }}">{{ num }}</a></li>
+            {% endif %}
+            {% endfor %}
+
+            {% if users.has_next %}
+            <li><a href="?page={{ users.next_page_number }}" class="next">Tiếp »</a></li>
+            {% else %}
+            <li><span class="next disabled">Tiếp »</span></li>
+            {% endif %}
+        </ul>
+    </div>
+    {% endif %}
+</div>
+{% endblock body %}

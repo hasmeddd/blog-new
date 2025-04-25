@@ -1,0 +1,543 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en-US">
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+	<title>Football - News</title>
+	<meta name="description" content="Katen - Minimal Blog & Magazine HTML Theme">
+	<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+	<link rel="shortcut icon" type="image/x-icon" href="images/favicon.png">
+
+	<!-- STYLES -->
+	<link rel="stylesheet" href="{%static 'css/bootstrap.min.css' %}" type="text/css" media="all">
+	<link rel="stylesheet" href="{%static 'css/all.min.css' %}" type="text/css" media="all">
+	<link rel="stylesheet" href="{%static 'css/slick.css' %}" type="text/css" media="all">
+	<link rel="stylesheet" href="{%static 'css/simple-line-icons.css' %}" type="text/css" media="all">
+	<link rel="stylesheet" href="{%static 'css/style.css' %}" type="text/css" media="all">
+	
+</head>
+<body>
+<div class="site-wrapper">
+	
+	<div class="main-overlay"></div>
+	{% include 'includes/header.html' %}
+	<!-- hero section -->
+	{% block main_content%}
+	<section id="hero">
+		<div class="container-xl">
+			<div class="row gy-4">
+				{% if messages %}
+					{% for message in messages %}
+						<div class="alert alert-{% if message.tags == 'success' %}success{% elif message.tags == 'error' %}danger{% else %}info{% endif %} alert-dismissible fade show" role="alert">
+							{{ message }}
+							<button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+						</div>
+					{% endfor %}
+				{% endif %}
+				<div class="col-lg-12">
+					<!-- match schedule -->
+					{% include 'includes/match_schedule.html' %}
+				</div>
+
+				<div class="col-lg-8">
+					<!-- featured post large -->
+					{% for post in main_post %}
+					<div class="post featured-post-lg">
+						<div class="details clearfix">
+							<a href="category.html" class="category-badge">{{post.category}}</a>
+							<h2 class="post-title"><a href="{% url "post_detail" post.post_slug %}">{{post.title}}</a></h2>
+							<ul class="meta list-inline mb-0">
+								<li class="list-inline-item"><a href="#">{{post.author}}</a></li>
+								<li class="list-inline-item">{{ post.created_at|date:"d/m/Y" }}</li>
+								<li class="list-inline-item">{{ post.views }} views</li>
+							</ul>
+						</div>
+						<a href="{% url "post_detail" post.post_slug %}">
+							<div class="thumb rounded">
+								<div class="inner data-bg-image" data-bg-image="{{post.image.url}}"></div>
+							</div>
+						</a>
+					</div>
+					{% endfor %}
+				</div>
+
+				<div class="col-lg-4">
+
+					<!-- post tabs -->
+					<div class="post-tabs rounded bordered">
+						<!-- tab navs -->
+						<ul class="nav nav-tabs nav-pills nav-fill" id="postsTab" role="tablist">
+							<li class="nav-item" role="presentation"><button aria-controls="popular" aria-selected="true" class="nav-link active" data-bs-target="#popular" data-bs-toggle="tab" id="popular-tab" role="tab" type="button">Phổ biến</button></li>
+							<li class="nav-item" role="presentation"><button aria-controls="recent" aria-selected="false" class="nav-link" data-bs-target="#recent" data-bs-toggle="tab" id="recent-tab" role="tab" type="button">Gần đây</button></li>
+						</ul>
+						<!-- tab contents -->
+						<div class="tab-content" id="postsTabContent">
+							<!-- loader -->
+							<div class="lds-dual-ring"></div>
+							<!-- popular posts -->
+							<div aria-labelledby="popular-tab" class="tab-pane fade show active" id="popular" role="tabpanel">
+								<!-- post -->
+								{% for post in popular %}
+								<div class="post post-list-sm circle">
+									<div class="thumb circle">
+										<a href="{% url "post_detail" post.post_slug %}">
+											<div class="inner">
+												<img src="{{post.image.url}}" alt="post-title" />
+											</div>
+										</a>
+									</div>
+									<div class="details clearfix">
+										<h6 class="post-title my-0"><a href="{% url "post_detail" post.post_slug %}">{{post.title}}</a></h6>
+										<ul class="meta list-inline mt-1 mb-0">
+											<li class="list-inline-item">{{ post.created_at|date:"d/m/Y" }}</li>
+										</ul>
+									</div>
+								</div>
+								{% endfor %}
+
+							</div>
+							<!-- recent posts -->
+							<div aria-labelledby="recent-tab" class="tab-pane fade" id="recent" role="tabpanel">
+								<!-- post -->
+								{% for post in recent %}
+								<div class="post post-list-sm circle">
+									<div class="thumb circle">
+										<a href="{% url "post_detail" post.post_slug %}">
+											<div class="inner">
+												<img src="{{post.image.url}}" alt="post-title" />
+											</div>
+										</a>
+									</div>
+									<div class="details clearfix">
+										<h6 class="post-title my-0"><a href="{% url "post_detail" post.post_slug %}">{{post.title}}</a></h6>
+										<ul class="meta list-inline mt-1 mb-0">
+											<li class="list-inline-item">{{ post.created_at|date:"d/m/Y" }}</li>
+										</ul>
+									</div>
+								</div>
+								{% endfor %}
+
+							</div>
+						</div>
+					</div>
+				</div>
+
+			</div>
+		</div>
+	</section>
+
+	<!-- section main content -->
+	
+	<section class="main-content">
+		<div class="container-xl">
+			<div class="row gy-4">
+				<div class="col-lg-8">
+					<div class="section-header">
+						<h3 class="section-title">Bóng đá Việt Nam</h3>
+					</div>
+	
+					<div class="padding-30 rounded bordered">
+						<div class="row gy-5">
+							<!-- Bài lớn (Bài đầu tiên) -->
+							<div class="col-sm-6">
+								{% for post in bong_da_vn|slice:":1" %}
+								<div class="post">
+									<div class="thumb rounded">
+										<a href="{% url 'category' post.category.slug %}" class="category-badge position-absolute">{{ post.category }}</a>
+										<a href="{% url 'post_detail' post.post_slug %}">
+											<div class="inner">
+												<img src="{{ post.image.url }}" alt="{{ post.title }}" />
+											</div>
+										</a>
+									</div>
+									<ul class="meta list-inline mt-4 mb-0">
+										<li class="list-inline-item"><a href="#">{{ post.author }}</a></li>
+										<li class="list-inline-item">{{ post.created_at|date:"d/m/Y" }}</li>
+									</ul>
+									<h5 class="post-title mb-3 mt-3"><a href="{% url 'post_detail' post.post_slug %}">{{ post.title }}</a></h5>
+									<p class="excerpt mb-0">{{ post.content|truncatewords:20|safe }}</p>
+								</div>
+								{% endfor %}
+							</div>
+					
+							<!-- 4 bài nhỏ (Bài 2 đến 5) -->
+							<div class="col-sm-6">
+								{% for post in bong_da_vn|slice:"1:5" %}
+								<div class="post post-list-sm square">
+									<div class="thumb rounded">
+										<a href="{% url 'post_detail' post.post_slug %}">
+											<div class="inner">
+												<img src="{{ post.image.url }}" alt="{{ post.title }}" />
+											</div>
+										</a>
+									</div>
+									<div class="details clearfix">
+										<h6 class="post-title my-0"><a href="{% url 'post_detail' post.post_slug %}">{{ post.title }}</a></h6>
+										<ul class="meta list-inline mt-1 mb-0">
+											<li class="list-inline-item">{{ post.created_at|date:"d/m/Y" }}</li>
+										</ul>
+									</div>
+								</div>
+								{% empty %}
+								<div class="col-md-12">
+									<p class="text-center">Chưa có bài viết nào</p>
+								</div>
+								{% endfor %}
+							</div>
+						</div>
+					</div>
+
+					<div class="spacer" data-height="50"></div>
+
+					<!-- Section header -->
+					<div class="section-header">
+						<h3 class="section-title">Đời sống</h3>
+						<div class="slick-arrows-top">
+							<button type="button" data-role="none" class="carousel-topNav-prev slick-custom-buttons" aria-label="Previous"><i class="icon-arrow-left"></i></button>
+							<button type="button" data-role="none" class="carousel-topNav-next slick-custom-buttons" aria-label="Next"><i class="icon-arrow-right"></i></button>
+						</div>
+					</div>
+
+					<div class="row post-carousel-twoCol post-carousel">
+						{% for post in doi_song %}
+						<div class="post post-over-content col-md-6">
+							<div class="details clearfix">
+								<a href="{% url 'category' post.category.slug %}" class="category-badge">{{ post.category }}</a>
+								<h4 class="post-title"><a href="{% url 'post_detail' post.post_slug %}">{{ post.title|truncatewords:10 }}</a></h4>
+								<ul class="meta list-inline mb-0">
+									<li class="list-inline-item"><a href="#">{{ post.author }}</a></li>
+									<li class="list-inline-item">{{ post.created_at|date:"d/m/Y" }}</li>
+								</ul>
+							</div>
+							<a href="{% url 'post_detail' post.post_slug %}">
+								<div class="thumb rounded">
+									<div class="inner">
+										<img src="{{ post.image.url }}" alt="{{ post.title }}" />
+									</div>
+								</div>
+							</a>
+						</div>
+						{% empty %}
+						<div class="col-md-12">
+							<p class="text-center">Chưa có bài viết nào trong danh mục Đời sống.</p>
+						</div>
+						{% endfor %}
+					</div>
+
+					<div class="spacer" data-height="50"></div>
+
+					<!-- section header -->
+					<div class="section-header">
+						<h3 class="section-title">Bài viết mới nhất</h3>
+					</div>
+
+					<!-- Trong phần "Bài viết mới nhất" -->
+					<div class="padding-30 rounded bordered">
+						<div class="row" id="post-list">  <!-- Thêm ID #post-list -->
+							{% for post in latest_posts %}
+							<div class="col-md-12 col-sm-6">
+								<div class="post post-list clearfix">
+									<div class="thumb rounded">
+										<a href="{% url 'post_detail' post.post_slug %}">
+											<div class="inner">
+												<img src="{{ post.image.url }}" alt="{{ post.title }}" />
+											</div>
+										</a>
+									</div>
+									<div class="details">
+										<ul class="meta list-inline mb-3">
+											<li class="list-inline-item">
+												<a href="#">
+													{{ post.author }}
+												</a>
+											</li>
+											<li class="list-inline-item"><a href="#">{{ post.category }}</a></li>
+											<li class="list-inline-item">{{ post.created_at|date:"d/m/Y" }}</li>
+										</ul>
+										<h5 class="post-title">
+											<a href="{% url 'post_detail' post.post_slug %}">{{ post.title }}</a>
+										</h5>
+										<p class="excerpt mb-0">{{ post.content|truncatewords:20|safe}}</p>
+										<span class="meta ">Lượt xem: {{ post.views }}</span>
+									</div>
+								</div>
+							</div>
+							{% empty %}
+							<div class="col-md-12">
+								<p class="text-center">Chưa có bài viết nào.</p>
+							</div>
+							{% endfor %}
+						</div>
+						<!-- Nút Tải thêm -->
+						<div class="text-center mt-4">
+							{% if latest_posts.has_next %}
+								<button class="btn btn-simple load-more" 
+										data-next-page="{{ latest_posts.next_page_number }}"
+										data-url="{% url 'index' %}">
+									Xem thêm
+								</button>
+							{% endif %}
+						</div>
+					</div>
+
+				</div>
+				<div class="col-lg-4">
+					<!-- sidebar -->
+					<div class="sidebar">
+						<!-- widget popular posts -->
+						<div class="widget rounded">
+							<div class="widget-header text-center">
+								<h3 class="widget-title">Bóng đá quốc tế</h3>
+							</div>
+							<div class="widget-content">
+								<!-- post -->
+								{% for post in bong_da_qt %}
+								<div class="post post-list-sm circle">
+									<div class="thumb circle">
+										<a href="{% url 'post_detail' post.post_slug %}">
+											<div class="inner">
+												<img src="{{ post.image.url }}" alt="{{ post.title }}" />
+											</div>
+										</a>
+									</div>
+									<div class="details clearfix">
+										<h6 class="post-title my-0"><a href="{% url 'post_detail' post.post_slug %}">{{ post.title }}</a></h6>
+										<ul class="meta list-inline mt-1 mb-0">
+											<li class="list-inline-item">{{ post.created_at|date:"d/m/Y" }}</li>
+										</ul>
+									</div>
+								</div>
+								{% empty %}
+								<div class="col-md-12">
+									<p class="text-center">Chưa có bài viết nào</p>
+								</div>
+								{% endfor %}
+							</div>		
+						</div>
+
+						<!-- widget popular posts -->
+						<div class="widget rounded">
+							<div class="widget-header text-center">
+								<h3 class="widget-title">Champions League</h3>
+							</div>
+							<div class="widget-content">
+								<!-- post -->
+								{% for post in champions_league %}
+								<div class="post post-list-sm circle">
+									<div class="thumb circle">
+										<a href="{% url 'post_detail' post.post_slug %}">
+											<div class="inner">
+												<img src="{{ post.image.url }}" alt="post-title" />
+											</div>
+										</a>
+									</div>
+									<div class="details clearfix">
+										<h6 class="post-title my-0"><a href="{% url 'post_detail' post.post_slug %}">{{ post.title }}</a></h6>
+										<ul class="meta list-inline mt-1 mb-0">
+											<li class="list-inline-item">{{ post.created_at|date:"d/m/Y" }}</li>
+										</ul>
+									</div>
+								</div>
+								{% empty %}
+								<div class="col-md-12">
+									<p class="text-center">Chưa có bài viết nào</p>
+								</div>
+								{% endfor %}
+							</div>		
+						</div>
+						
+						<!-- widget popular posts -->
+						<div class="widget rounded">
+							<div class="widget-header text-center">
+								<h3 class="widget-title">Ngoại hạng anh</h3>
+							</div>
+							<div class="widget-content">
+								<!-- post -->
+								{% for post in ngoai_hang_anh %}
+								<div class="post post-list-sm circle">
+									<div class="thumb circle">
+										<a href="{% url 'post_detail' post.post_slug %}">
+											<div class="inner">
+												<img src="{{ post.image.url }}" alt="post-title" />
+											</div>
+										</a>
+									</div>
+									<div class="details clearfix">
+										<h6 class="post-title my-0"><a href="{% url 'post_detail' post.post_slug %}">{{ post.title }}</a></h6>
+										<ul class="meta list-inline mt-1 mb-0">
+											<li class="list-inline-item">{{ post.created_at|date:"d/m/Y" }}</li>
+										</ul>
+									</div>
+								</div>
+								{% empty %}
+								<div class="col-md-12">
+									<p class="text-center">Chưa có bài viết nào</p>
+								</div>
+								{% endfor %}
+							</div>		
+						</div>
+
+						<!-- widget popular posts -->
+						<div class="widget rounded">
+							<div class="widget-header text-center">
+								<h3 class="widget-title">La Liga</h3>
+							</div>
+							<div class="widget-content">
+								<!-- post -->
+								{% for post in la_liga %}
+								<div class="post post-list-sm circle">
+									<div class="thumb circle">
+										<a href="{% url 'post_detail' post.post_slug %}">
+											<div class="inner">
+												<img src="{{ post.image.url }}" alt="post-title" />
+											</div>
+										</a>
+									</div>
+									<div class="details clearfix">
+										<h6 class="post-title my-0"><a href="{% url 'post_detail' post.post_slug %}">{{ post.title }}</a></h6>
+										<ul class="meta list-inline mt-1 mb-0">
+											<li class="list-inline-item">{{ post.created_at|date:"d/m/Y" }}</li>
+										</ul>
+									</div>
+								</div>
+								{% empty %}
+								<div class="col-md-12">
+									<p class="text-center">Chưa có bài viết nào</p>
+								</div>
+								{% endfor %}
+							</div>		
+						</div>
+
+						<!-- widget popular posts -->
+						<div class="widget rounded">
+							<div class="widget-header text-center">
+								<h3 class="widget-title">Serie A</h3>
+							</div>
+							<div class="widget-content">
+								<!-- post -->
+								{% for post in serie_a %}
+								<div class="post post-list-sm circle">
+									<div class="thumb circle">
+										<a href="{% url 'post_detail' post.post_slug %}">
+											<div class="inner">
+												<img src="{{ post.image.url }}" alt="post-title" />
+											</div>
+										</a>
+									</div>
+									<div class="details clearfix">
+										<h6 class="post-title my-0"><a href="{% url 'post_detail' post.post_slug %}">{{ post.title }}</a></h6>
+										<ul class="meta list-inline mt-1 mb-0">
+											<li class="list-inline-item">{{ post.created_at|date:"d/m/Y" }}</li>
+										</ul>
+									</div>
+								</div>
+								{% empty %}
+								<div class="col-md-12">
+									<p class="text-center">Chưa có bài viết nào</p>
+								</div>
+								{% endfor %}
+							</div>		
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</section>
+	
+	{% endblock main_content%}
+
+	{% include 'includes/footer.html' %}
+
+	
+</div>
+
+
+<!-- canvas menu -->
+<div class="canvas-menu d-flex align-items-end flex-column">
+	<!-- close button -->
+	<button type="button" class="btn-close" aria-label="Close"></button>
+
+	<!-- logo -->
+	<div class="name_profile">
+		<span>Xin chào: {{ request.user }}</span>
+	</div>
+	
+	<!-- menu -->
+	<nav>
+		<ul class="vertical-menu">
+			<li>
+				{% if request.user.is_superuser %}
+					<!-- Hiển thị Dashboard nếu là superadmin -->
+					<a href="{% url 'dashboard' %}">Bảng điều khiển</a>
+				{% endif %}</li>
+			<li><a href="{% url 'recent_activity' %}">Hoạt động gần đây</a></li>
+			<li><a href="{% url 'personal' %}">Thông tin cá nhân</a></li>
+			<li><a href="{% url 'contact' %}">Liên hệ</a></li>
+			<li><a href="{% url 'logout' %}">Đăng xuất</a></li>
+		</ul>
+	</nav>
+
+</div>
+
+<!-- JAVA SCRIPTS -->
+<script src="{%static 'js/jquery.min.js' %}"></script>
+<script src="{%static 'js/popper.min.js' %}"></script>
+<script src="{%static 'js/bootstrap.min.js' %}"></script>
+<script src="{%static 'js/slick.min.js' %}"></script>
+<script src="{%static 'js/jquery.sticky-sidebar.min.js' %}"></script>
+<script src="{%static 'js/custom.js' %}"></script>
+<script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+<script>
+	// Tự động ẩn alert sau 5 giây nếu người dùng không đóng
+  document.addEventListener('DOMContentLoaded', function() {
+	var alerts = document.querySelectorAll('.alert');
+	alerts.forEach(function(alert) {
+		setTimeout(function() {
+			if (alert.classList.contains('show')) {
+				var bsAlert = new bootstrap.Alert(alert);
+				bsAlert.close();
+			}
+		}, 5000);
+	});
+  });
+</script>
+<script>
+	$(document).ready(function() {
+		$('.load-more').click(function() {
+			var button = $(this);
+			var nextPage = button.data('next-page');
+			var url = button.data('url');
+	
+			$.ajax({
+				url: url,
+				data: {
+					'page': nextPage
+				},
+				success: function(data) {
+					var parser = new DOMParser();
+					var doc = parser.parseFromString(data, 'text/html');
+					
+					var newPosts = $(doc).find('#post-list').children();
+					$('#post-list').append(newPosts);
+					
+					var newButton = $(doc).find('.load-more');
+					if (newButton.length > 0) {
+						button.data('next-page', newButton.data('next-page'));
+					} else {
+						button.remove();
+					}
+				},
+				error: function(xhr, status, error) {
+					console.log('Lỗi khi tải thêm bài viết:', error);
+				}
+			});
+		});
+	});
+</script>
+
+</body>	
+</html>
+
+
+
+	
