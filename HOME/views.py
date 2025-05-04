@@ -42,6 +42,14 @@ def register(request):
                     else:
                         messages.error(request, f'Lỗi tên tài khoản: {error}')
             
+            # Kiểm tra lỗi email
+            if 'email' in errors:
+                for error in errors['email']:
+                    if error.code == 'unique':
+                        messages.error(request, 'Email này đã được sử dụng. Vui lòng chọn email khác!')
+                    else:
+                        messages.error(request, f'Lỗi email: {error}')
+            
             if 'password2' in errors:
                 for error in errors['password2']:
                     if error.code == 'password_mismatch':
@@ -236,8 +244,25 @@ def personal(request):
                 messages.success(request, 'Thông tin cá nhân đã được cập nhật!')
                 return redirect('personal')
             else:
+                errors = form.errors.as_data()
                 print(f"Lỗi form: {form.errors}")  
-                messages.error(request, 'Có lỗi khi cập nhật thông tin. Vui lòng kiểm tra lại!')
+                # Kiểm tra lỗi email
+                if 'email' in errors:
+                    for error in errors['email']:
+                        if error.code == 'unique':
+                            messages.error(request, 'Email này đã được sử dụng. Vui lòng chọn email khác!')
+                        else:
+                            messages.error(request, f'Lỗi email: {error}')
+                # Kiểm tra lỗi username
+                if 'username' in errors:
+                    for error in errors['username']:
+                        if error.code == 'unique':
+                            messages.error(request, 'Tên tài khoản đã tồn tại. Vui lòng chọn tên khác!')
+                        else:
+                            messages.error(request, f'Lỗi tên tài khoản: {error}')
+                # Thông báo lỗi chung nếu có lỗi khác
+                if not errors.get('email') and not errors.get('username'):
+                    messages.error(request, 'Có lỗi khi cập nhật thông tin. Vui lòng kiểm tra lại!')
         
         elif 'change_password' in request.POST:
             password_form = PasswordChangeForm(user, request.POST)

@@ -32,6 +32,12 @@ class CreateUserForm(UserCreationForm):
         self.fields['last_name'].widget.attrs.update({'class': 'form-control', 'id': 'form3Example1l'})
         self.fields['password1'].widget.attrs.update({'class': 'form-control', 'id': 'form3Example4c'})
         self.fields['password2'].widget.attrs.update({'class': 'form-control', 'id': 'form3Example4cd'})
+    
+    def clean_email(self):
+        email = self.cleaned_data.get('email')
+        if User.objects.filter(email=email).exists():
+            raise forms.ValidationError('Email này đã được sử dụng.', code='unique')
+        return email
 
 class UpdateUserForm(forms.ModelForm):
     class Meta:
@@ -44,6 +50,12 @@ class UpdateUserForm(forms.ModelForm):
         self.fields['email'].widget.attrs.update({'class': 'form-control', 'id': 'form3Example3c'})
         self.fields['first_name'].widget.attrs.update({'class': 'form-control', 'id': 'form3Example1f'})
         self.fields['last_name'].widget.attrs.update({'class': 'form-control', 'id': 'form3Example1l'})
+
+    def clean_email(self):
+        email = self.cleaned_data.get('email')
+        if User.objects.filter(email=email).exclude(id=self.instance.id).exists():
+            raise forms.ValidationError('Email này đã được sử dụng.', code='unique')
+        return email
         
 class Category(models.Model):
     category_id = models.AutoField(primary_key=True)

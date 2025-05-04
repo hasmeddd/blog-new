@@ -156,5 +156,5 @@ EMAIL_HOST = 'smtp.gmail.com'
 EMAIL_PORT = 587
 EMAIL_USE_TLS = True
 EMAIL_HOST_USER = 'vanthanh1351@gmail.com'  # Thay bằng email của bạn
-EMAIL_HOST_PASSWORD = 'vdpdmnxbgnuyuxda'  # Thay bằng mật khẩu ứng dụng (App Password nếu dùng Gmail)
+EMAIL_HOST_PASSWORD = ''  # Thay bằng mật khẩu ứng dụng (App Password nếu dùng Gmail)
 DEFAULT_FROM_EMAIL = 'vanthanh1351@gmail.com'
